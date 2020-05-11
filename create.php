@@ -47,19 +47,45 @@
     <head>
         <meta charset="UTF-8">
         <title>PHTA-v2</title>
+        <style>
+            body
+            {
+                background-color: black;
+            }
+            #body
+            {
+                background-color: white;
+            }
+            h3, b, hr
+            {
+                color: #73000a;
+            }
+        </style>
     </head>
     <body>
-        <form action="" method="post" enctype="multipart/form-data">
-            <h3>Create Account</h3><hr>
-            Email: <input type="email" name="email1"><br><br>
-            Confirm Email: <input type="email" name="email2" require><br><br>
-            Password: <input type="text" name="password1" require><br><br>
-            Confirm Password: <input type="text" name="password2" require><br><br>
-            <input type="submit" name="create_account" value="Create Account" Required>
-            <?php
-                echo $create_account_message;
-            ?>
-        </form>
-        <a href="index.php">Click here</a> to login.
+        <div id="body">
+            <h1 style="display:inline; font-weight:normal">
+                <b>PH</b>enotype <b>T</b>ranscriptomic <b>A</b>ssociation <b>Calculator</b>
+            </h1>
+            <img id="img2" src="img/nsf-logo.png" height="68px" width="68px" style="display: inline; float:right">
+            <img src="img/usc.jpeg" height="68px" width="68px" style="display: inline; float:right">
+            </br>
+            Work of Dr. Homayoun Valafar, Dr. Hippokratis Kiaris, Naga Venkata Sai Jagjit (JJ) Satti, Youwen Zhang
+            <hr>
+        </div>
+        <div id="body">
+            <form action="" method="post" enctype="multipart/form-data">
+                <h3>Create Account</h3><hr>
+                Email: <input type="email" name="email1"><br><br>
+                Confirm Email: <input type="email" name="email2" require><br><br>
+                Password: <input type="text" name="password1" require><br><br>
+                Confirm Password: <input type="text" name="password2" require><br><br>
+                <input type="submit" name="create_account" value="Create Account" Required>
+                <?php
+                    echo $create_account_message;
+                ?>
+            </form>
+            <a href="index.php">Click here</a> to login.
+        </div>
     </body>
 </html>

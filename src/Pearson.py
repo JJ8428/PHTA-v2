@@ -20,6 +20,7 @@ srcData = r1.readline().replace("\n", "")
 count1 = int(r1.readline())
 count2 = int(r1.readline())
 saveAs = r1.readline().replace("\n", "")
+
 userInput = []
 for line in r1.readlines():
     line = line.replace(', ', ',').replace('^M', "").replace("\n", "").replace("\r", "").split(",")
@@ -49,13 +50,6 @@ for line in r2.readlines():
         try:
             line[a] = float(line[a])
         except Exception as e:
-            '''print(line)
-            print('.')
-            print(linecount)
-            print('.')
-            print(a)
-            print('.')
-            print(e)'''
             line[a] = 0
     if line[0] == '' or line[0].__len__() == 0:
         line[0] = 'null' + str(nullCount)
