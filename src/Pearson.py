@@ -49,11 +49,14 @@ for line in r2.readlines():
         try:
             line[a] = float(line[a])
         except Exception as e:
-            print(line)
+            '''print(line)
+            print('.')
             print(linecount)
+            print('.')
             print(a)
-            print(e)
-            exit(1)
+            print('.')
+            print(e)'''
+            line[a] = 0
     if line[0] == '' or line[0].__len__() == 0:
         line[0] = 'null' + str(nullCount)
         nullCount += 1

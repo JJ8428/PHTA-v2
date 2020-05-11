@@ -126,7 +126,7 @@
         if (!$error)
         {
             $write = fopen('users/dirs/' . $_SESSION['whoami'] . '/tmp/requests', 'w');
-            fwrite($write, $_SESSION['whoami'] . "\n" . $_SESSION['file'] . "\n" . $_SESSION['count1'] . "\n" .$_SESSION['count2'] . "\n" . $_POST['saveas'] . "\n" . $_POST['userInput1']);
+            fwrite($write, $_SESSION['whoami'] . "\n" . $_SESSION['file'] . "\n" . $_SESSION['count1'] . "\n" .$_SESSION['count2'] . "\n" . $_POST['saveas'] . "\n" . str_replace("\t", ",", $_POST['userInput1']));
             fclose($write);
             $write2 = fopen('activeDir', 'w');
             fwrite($write2, $_SESSION['whoami']);
@@ -171,6 +171,7 @@
         while (!feof($read))
         {
             $line = fgets($read);
+            $line = str_replace("\n", '', $line);
             $tmp = strtolower(explode(',', $line)[0]);
             for ($x = 0; $x < sizeof($_2dArray); $x++)
             {
@@ -233,6 +234,12 @@
     {
         $_SESSION['pngFile'] = '<img src="' . $_POST['pngfile'] . '"><br><br>';
     }
+
+    # Delete Commit Data
+    if (isset($_POST['deleteCommit']))
+    {
+        unlink($_POST['deletezipfile']);
+    }
 ?>
 <html>
     <head>
@@ -246,7 +253,7 @@
                 // Login menu
                 if (!$_SESSION['logged'])
                 {
-                    echo '<h3>Login</h3><hr>' . 
+                    echo '<h3>Login:</h3><hr>' . 
                     'Email: <input type="email" name="email" Required><br><br>' .
                     'Password: <input type="text" name="password" Required><br><br>' . 
                     '<input type="submit" name="login" value="Login"><br><br>';
@@ -272,7 +279,7 @@
                 // Upload menu
                 if ($_SESSION['logged'] && $_SESSION['page'] == 1)
                 {
-                    echo '<h3>Upload</h3><hr>' .
+                    echo '<h3>Upload:</h3><hr>' .
                     '<input type="file" name="fileToUpload"><br><br>' .
                     '<input type="submit" name="upload" value="Upload">';
                 }
@@ -283,7 +290,7 @@
                 // Delete menu
                 if ($_SESSION['logged'] && $_SESSION['page'] == 1)
                 {
-                    echo '<h3>Delete</h3><hr>' .
+                    echo '<h3>Delete:</h3><hr>' .
                     'Select the file(s) to delete:<br><br>' .
                     '<select name="filetoDel[]" multiple="multiple">';
                     $files = scandir('users/dirs/' . $_SESSION['whoami'] . '/files');
@@ -301,7 +308,7 @@
                 // Inventory
                 if ($_SESSION['logged'] && $_SESSION['page'] == 1)
                 {
-                    echo '<h3>Inventory</h3><hr>' . 
+                    echo '<h3>Inventory:</h3><hr>' . 
                     '<table border="1">' . 
                         '<tr><th>File:</th><th>Date Uploaded:</th><tr>';
                     $files = scandir('users/dirs/' . $_SESSION['whoami'] . '/files');
@@ -316,7 +323,7 @@
         <?php
             if ($_SESSION['logged']  && $_SESSION['page'] == 2)
             {
-                echo '<h3>Commit with Hypothetical Phenotypes</h3><hr>';
+                echo '<h3>Commit with Hypothetical Phenotypes:</h3><hr>';
             }
         ?>
         <form action="" method="post" enctype="multipart/form-data">
@@ -373,7 +380,7 @@
         <?php
             if ($_SESSION['logged'] && $_SESSION['page'] == 2)
             {
-                echo '<h3>Commit with Pre-existing Phenotypes</h3><hr>';
+                echo '<h3>Commit with Pre-existing Phenotypes:</h3><hr>';
             }
         ?>
          <form action="" method="post" enctype="multipart/form-data">
@@ -422,8 +429,8 @@
                 // Show commit history
                 if ($_SESSION['logged'] && $_SESSION['page'] == 3)
                 { 
-                    echo '<h3>Commits:</h3><hr>' .
-                    'Select the save to view data:<br><br>' .
+                    echo '<h3>Access Commits:</h3><hr>' .
+                    'Select the save to view:<br><br>' .
                     '<select name="zipfile">';
                     $files = scandir('users/dirs/' . $_SESSION['whoami'] . '/zip');
                     for ($x = 2; $x < sizeof($files); $x++)
@@ -440,18 +447,36 @@
                 // Show the commit download and option to scroll photos
                 if ($_SESSION['logged'] && $_SESSION['showPNG'] && $_SESSION['page'] == 3)
                 {
-                    echo '<h3>View Commit:</h3><hr>';
-                    echo $_SESSION['pngFile'];
-                    echo 'Select plot for display:<br><br>' . 
+                    echo '<h3>View Plots:</h3><hr>' . 
+                    $_SESSION['pngFile'] .
+                    'Select plot for display:<br><br>' . 
                     '<select name="pngfile">';
                     $pngs = scandir('users/dirs/' . $_SESSION['whoami'] . '/results');
-                    for ($x = 2; $x < sizeof($files); $x++)
+                    for ($x = 2; $x < sizeof($pngs); $x++)
                     {
                         echo '<option value="' .  'users/dirs/' . $_SESSION['whoami'] . '/results/' . $pngs[$x] . '">' . $pngs[$x] . '</option>';
                     }
                     echo '</select><br><br>' . 
-                    '<input type="submit" name="display" value="Display Plot"><br><br>';
-                    echo $_SESSION['zipFile'];
+                    '<input type="submit" name="display" value="Display Plot"><br><br>' . 
+                    $_SESSION['zipFile'];
+                }
+            ?>
+        </form>
+        <form action="" method="post" enctype="multipart/form-data">
+            <?php
+                // Give the option to delete a previous commit
+                if ($_SESSION['logged'] && $_SESSION['page'] == 3)
+                {
+                    echo '<h3>Delete Commits:</h3><hr>' .
+                    'Select the save to delete:<br><br>' .
+                    '<select name="deletezipfile">';
+                    $files = scandir('users/dirs/' . $_SESSION['whoami'] . '/zip');
+                    for ($x = 2; $x < sizeof($files); $x++)
+                    {
+                        echo '<option value="' .  'users/dirs/' . $_SESSION['whoami'] . '/zip/' . $files[$x] . '">' . $files[$x] . '</option>';
+                    }
+                    echo '</select><br><br>' . 
+                    '<input type="submit" name="deleteCommit" value="Delete Commit">';
                 }
             ?>
         </form>
