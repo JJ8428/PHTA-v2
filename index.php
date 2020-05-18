@@ -67,12 +67,17 @@
     {
         $_SESSION['page'] = 3;
     }
+    if (isset($_POST['page4']))
+    {
+        $_SESSION['page'] = 4;
+    }
 
 
     # Upload function
     if (isset($_POST['upload']))
     {
         $target_dir = 'users/dirs/' . $_SESSION['whoami'] . '/files/' . $_FILES['fileToUpload']['name'];
+        echo shell_exec('dos2unix ' . $target_dir);
         move_uploaded_file($_FILES['fileToUpload']['tmp_name'], $target_dir);
     }
 
@@ -96,7 +101,7 @@
     {
         $read = fopen($_POST['filetoCalc'], 'r');
         $_SESSION['file'] = $_POST['filetoCalc'];
-        $temp = explode(',', fgets($read));
+        $temp = explode(',', str_replace('^M', '', fgets($read)));
         $_SESSION['count1'] = intval($temp[0]);
         $_SESSION['count2'] = intval($temp[1]);
         $_SESSION['columns'] = explode(',', fgets($read));
@@ -137,6 +142,7 @@
             echo shell_exec('env/bin/python src/Pearson.py 2>&1');
         }
         $_SESSION['step2'] = 0;
+        $_SESSION['page'] = 3;
     }
 
     # Restart From 2
@@ -216,7 +222,8 @@
             // Reminder: Ask Mrs. Casey to create the virtual env with python and modules through email
             echo shell_exec('env/bin/python src/Pearson.py 2>&1');
         }
-        $_SESSION['step2'] = 0;   
+        $_SESSION['step2'] = 0;
+        $_SESSION['page'] = 3;  
     }
 
     # View Commit Data
@@ -232,7 +239,7 @@
     }
     if (isset($_POST['display']))
     {
-        $_SESSION['pngFile'] = '<img src="' . $_POST['pngfile'] . '"><br><br>';
+        $_SESSION['pngFile'] = '<img height=50% length=50% src="' . $_POST['pngfile'] . '"><br><br>';
     }
 
     # Delete Commit Data
@@ -240,20 +247,56 @@
     {
         unlink($_POST['deletezipfile']);
     }
+
+    # Leave Feedback
+    if (isset($_POST['leaveFB']))
+    {
+        $write = fopen('feedback', 'w');
+        $line = '=====' . "\n" . $_SESSION['whoami'] . "\n" . $_POST['feedback'] . "\n" . '=====' . "\n";
+        fwrite($write, $line);
+        fclose($write);
+
+    }
 ?>
 <html>
     <head>
-        <meta charset="UTF-8">
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
         <title>PHTA-v2</title>
+        <link rel="stylesheet" type="text/css" href="style.css">
     </head>
     <style>
         body
         {
             background-color: black;
+        	font:14px/1.4 'Arial', 'Helvetica', sans-serif;
         }
         #body
         {
             background-color: white;
+            padding: 0;
+        }
+        #body1
+        {
+            background-color: #C70039;
+            color: white;
+        }
+        #body1 b
+        {
+            color: white;
+        }
+        .page
+        {
+            color: white;
+            font-weight: bold;
+            border-style: solid;
+            background-color: #C70029;
+            height: 30px;
+            border-color: #C70039;
+        }
+        .page:hover
+        {
+            background-color: #73000a;
         }
         h3, b, hr
         {
@@ -265,11 +308,10 @@
             <h1 style="display:inline; font-weight:normal">
                 <b>PH</b>enotype <b>T</b>ranscriptomic <b>A</b>ssociation <b>Calculator</b>
             </h1>
-            <img id="img2" src="img/nsf-logo.png" height="68px" width="68px" style="display: inline; float:right">
-            <img src="img/usc.jpeg" height="68px" width="68px" style="display: inline; float:right">
+            <img id="img2" src="img/nsf-logo.png" height="59px" width="59px" style="display: inline; float:right">
+            <img src="img/usc.jpeg" height="59px" width="59px" style="display: inline; float:right">
             </br>
-            Work of Dr. Homayoun Valafar, Dr. Hippokratis Kiaris, Naga Venkata Sai Jagjit (JJ) Satti, Youwen Zhang
-            <hr>
+            Work of Dr. Homayoun Valafar, Dr. Hippokratis Kiaris, Youwen Zhang, Naga Venkata Sai Jagjit (JJ) Satti
         </div>
         <div id="body">
             <form action="" method="post" enctype="multipart/form-data">
@@ -285,16 +327,19 @@
                     }
                 ?>
             </form>
+        </div>
+        <div id="body1">
             <form action="" method="post" enctype="multipart/form-data">
                 <?php
-                    // Logout menu
+                    // Navigation tools
                     if ($_SESSION['logged'])
                     {
                         echo '<b>Profile:</b> ' . $_SESSION['whoami'] .
-                        ' <input type="submit" name="logout" value="Logout">' . 
-                        ' <b>Navigate:</b> <input type="submit" name="page1" value="Files">' . 
-                        ' <input type="submit" name="page2" value="Commit">' . 
-                        ' <input type="submit" name="page3" value="View">';
+                        '<input type="submit" name="logout" class="page" value="Logout">' . 
+                        '<input type="submit" class="page" name="page1" value="Manage Files">' . 
+                        '<input type="submit" name="page2" class="page" value="Analyze">' . 
+                        '<input type="submit" name="page3" class="page" value="View Results">' . 
+                        '<input type="submit" name="page4" class="page" value="Leave Feedback">';
                     }
                 ?>
             </form>
@@ -349,9 +394,56 @@
         </div>
         <div id="body">
             <?php
+                if ($_SESSION['logged'] && $_SESSION['page'] == 2)
+                {
+                    echo '<h3>Analyze with Gene Expression Data:</h3><hr>';
+                }
+            ?>
+            <form action="" method="post" enctype="multipart/form-data">
+                <?php
+                    // Restart Form 2
+                    if ($_SESSION['step2'] > 0 && $_SESSION['page'] == 2)
+                    {
+                        echo '<input type="submit" name="restart2" value="Restart Form">';
+                    }
+                ?>
+            </form>
+            <form action="" method="post" enctype="multipart/form-data">
+                <?php
+                    // Pre-existing Calculation Step 1
+                    if ($_SESSION['logged'] && $_SESSION['step2'] == 0 && $_SESSION['page'] == 2)
+                    {
+                        echo 'Select the file(s) to calculate with:<br><br>' .
+                        '<select name="filetoCalc2">';
+                        $files = scandir('users/dirs/' . $_SESSION['whoami'] . '/files');
+                        for ($x = 2; $x < sizeof($files); $x++)
+                        {
+                            echo '<option value="' .  'users/dirs/' . $_SESSION['whoami'] . '/files/' . $files[$x] . '">' . $files[$x] . '</option>';
+                        }
+                        echo '</select><br><br>' . 
+                        '<input type="submit" name="nextStep2" value="Next Step">';
+                    }
+                ?>
+            </form>
+            <form action="" method="post" enctype="multipart/form-data">
+                <?php
+                    // Pre-existing Calculation Step 2
+                    if ($_SESSION['logged'] && $_SESSION['step2'] == 1 && $_SESSION['page'] == 2)
+                    {
+                        echo $CalcMessage2;
+                        echo 'The file requires all <b>' . $_SESSION['columns'][0] . '</b> of interest:' . 
+                        '<h6>Input must be comma delimited</h6>' . 
+                        '<textarea name="userInput2" rows="5" cols="50" Required></textarea><br><br>' .
+                        'Save commit as: ' . 
+                        '<input type="text" name="saveas2"><br><br>' . 
+                        '<input type="submit" name="commit2" value="Generate Data">';
+                    }
+                ?>
+            </form>
+            <?php
                 if ($_SESSION['logged']  && $_SESSION['page'] == 2)
                 {
-                    echo '<h3>Commit with Hypothetical Phenotypes:</h3><hr>';
+                    echo '<h3>Analyze with Quantitative Data:</h3><hr>';
                 }
             ?>
             <form action="" method="post" enctype="multipart/form-data">
@@ -401,54 +493,7 @@
                         '<textarea name="userInput1" rows="5" cols="50" Required></textarea><br><br>' .
                         'Save commit as: ' . 
                         '<input type="text" name="saveas"><br><br>' . 
-                        '<input type="submit" name="commit" value="Commit">';
-                    }
-                ?>
-            </form>
-            <?php
-                if ($_SESSION['logged'] && $_SESSION['page'] == 2)
-                {
-                    echo '<h3>Commit with Pre-existing Phenotypes:</h3><hr>';
-                }
-            ?>
-            <form action="" method="post" enctype="multipart/form-data">
-                <?php
-                    // Restart Form 2
-                    if ($_SESSION['step2'] > 0 && $_SESSION['page'] == 2)
-                    {
-                        echo '<input type="submit" name="restart2" value="Restart Form">';
-                    }
-                ?>
-            </form>
-            <form action="" method="post" enctype="multipart/form-data">
-                <?php
-                    // Pre-existing Calculation Step 1
-                    if ($_SESSION['logged'] && $_SESSION['step2'] == 0 && $_SESSION['page'] == 2)
-                    {
-                        echo 'Select the file(s) to calculate with:<br><br>' .
-                        '<select name="filetoCalc2">';
-                        $files = scandir('users/dirs/' . $_SESSION['whoami'] . '/files');
-                        for ($x = 2; $x < sizeof($files); $x++)
-                        {
-                            echo '<option value="' .  'users/dirs/' . $_SESSION['whoami'] . '/files/' . $files[$x] . '">' . $files[$x] . '</option>';
-                        }
-                        echo '</select><br><br>' . 
-                        '<input type="submit" name="nextStep2" value="Next Step">';
-                    }
-                ?>
-            </form>
-            <form action="" method="post" enctype="multipart/form-data">
-                <?php
-                    // Pre-existing Calculation Step 2
-                    if ($_SESSION['logged'] && $_SESSION['step2'] == 1 && $_SESSION['page'] == 2)
-                    {
-                        echo $CalcMessage2;
-                        echo 'The file requires all <b>' . $_SESSION['columns'][0] . '</b> of interest:' . 
-                        '<h6>Input must be comma delimited</h6>' . 
-                        '<textarea name="userInput2" rows="5" cols="50" Required></textarea><br><br>' .
-                        'Save commit as: ' . 
-                        '<input type="text" name="saveas2"><br><br>' . 
-                        '<input type="submit" name="commit2" value="Commit">';
+                        '<input type="submit" name="commit" value="Generate Data">';
                     }
                 ?>
             </form>
@@ -459,7 +504,7 @@
                     // Show commit history
                     if ($_SESSION['logged'] && $_SESSION['page'] == 3)
                     { 
-                        echo '<h3>Access Commits:</h3><hr>' .
+                        echo '<h3>Access Data:</h3><hr>' .
                         'Select the save to view:<br><br>' .
                         '<select name="zipfile">';
                         $files = scandir('users/dirs/' . $_SESSION['whoami'] . '/zip');
@@ -497,7 +542,7 @@
                     // Give the option to delete a previous commit
                     if ($_SESSION['logged'] && $_SESSION['page'] == 3)
                     {
-                        echo '<h3>Delete Commits:</h3><hr>' .
+                        echo '<h3>Delete Data:</h3><hr>' .
                         'Select the save to delete:<br><br>' .
                         '<select name="deletezipfile">';
                         $files = scandir('users/dirs/' . $_SESSION['whoami'] . '/zip');
@@ -506,7 +551,19 @@
                             echo '<option value="' .  'users/dirs/' . $_SESSION['whoami'] . '/zip/' . $files[$x] . '">' . $files[$x] . '</option>';
                         }
                         echo '</select><br><br>' . 
-                        '<input type="submit" name="deleteCommit" value="Delete Commit">';
+                        '<input type="submit" name="deleteCommit" value="Delete Data">';
+                    }
+                ?>
+            </form>
+            <form action="" method="post" enctype="multipart/form-data">
+                <?php
+                    // Allow for feedback 
+                    if ($_SESSION['logged'] && $_SESSION['page'] == 4)
+                    {
+                        echo '<h3>Leave Feedback:</h3><hr>' . 
+                        'Please leave any comments regarding any improvements to PHTA or errors encounters while using PHTA:<br><br>' .
+                        '<textarea name="feedback" rows="5" cols="50" Required></textarea><br><br>' .
+                        '<input type="submit" name="leaveFB" value="Submit">';
                     }
                 ?>
             </form>
