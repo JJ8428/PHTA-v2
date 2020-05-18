@@ -251,7 +251,7 @@
     # Leave Feedback
     if (isset($_POST['leaveFB']))
     {
-        $write = fopen('feedback', 'w');
+        $write = fopen('feedback', 'a');
         $line = '=====' . "\n" . $_SESSION['whoami'] . "\n" . $_POST['feedback'] . "\n" . '=====' . "\n";
         fwrite($write, $line);
         fclose($write);
