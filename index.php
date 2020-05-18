@@ -77,8 +77,8 @@
     if (isset($_POST['upload']))
     {
         $target_dir = 'users/dirs/' . $_SESSION['whoami'] . '/files/' . $_FILES['fileToUpload']['name'];
-        echo shell_exec('dos2unix ' . $target_dir);
         move_uploaded_file($_FILES['fileToUpload']['tmp_name'], $target_dir);
+	shell_exec('dos2unix ' . $target_dir);
     }
 
     # Delete function
