@@ -71,6 +71,10 @@
     {
         $_SESSION['page'] = 4;
     }
+    if (isset($_POST['page5']))
+    {
+        $_SESSION['page'] = 5;
+    }
 
 
     # Upload function
@@ -78,7 +82,7 @@
     {
         $target_dir = 'users/dirs/' . $_SESSION['whoami'] . '/files/' . $_FILES['fileToUpload']['name'];
         move_uploaded_file($_FILES['fileToUpload']['tmp_name'], $target_dir);
-	shell_exec('dos2unix ' . $target_dir);
+        shell_exec('dos2unix ' . $target_dir);
     }
 
     # Delete function
@@ -115,6 +119,7 @@
     {
         // This makes it to allow tab delimited, but replaces /t with ','
         $tmp = str_replace("\t", ",", $_POST['userInput1']);
+        $tmp = str_replace(' ,', ',', $_POST['userInput1']);
         $_2dArray = explode("\n", $tmp);
         $errors = FALSE;
         $limit = 1 + ($_SESSION['count2'] - $_SESSION['count1']) + 1;
@@ -140,9 +145,9 @@
             // Run the Python script from a virtual env
             // Reminder: Ask Mrs. Casey to create the virtual env with python and modules through email
             echo shell_exec('env/bin/python src/Pearson.py 2>&1');
+            $_SESSION['page'] = 3;
+            $_SESSION['step2'] = 0;
         }
-        $_SESSION['step2'] = 0;
-        $_SESSION['page'] = 3;
     }
 
     # Restart From 2
@@ -167,7 +172,12 @@
     # Pre-existing Calculation Step 2
     if (isset($_POST['commit2']))
     {
-        $_2dArray = explode(',', $_POST['userInput2']);
+        echo 'a';
+        $tmp = $_POST['userInput2'];
+        $tmp = str_replace(', ', ',', $tmp);
+        $tmp = str_replace(' ,', ',', $tmp);
+        $tmp = ltrim($tmp);
+        $_2dArray = explode(',', $tmp);
         $errors = FALSE;
         $read = fopen($_SESSION['file'], 'r');
         fgets($read);
@@ -181,20 +191,28 @@
             $tmp = strtolower(explode(',', $line)[0]);
             for ($x = 0; $x < sizeof($_2dArray); $x++)
             {
+                $clone = 0;
                 if ($tmp == strtolower($_2dArray[$x]))
                 {
                     $count -= 1;
-                    array_push($_SESSION['array'], explode(',', $line)); 
+                    $toAdd = explode(',', $line);
+                    echo $tmp;
+                    array_push($_SESSION['array'], $toAdd);
+                    continue;
                 }
             }
         }
+        echo 'b';
         fclose($read);
-        if ($count != 0)
+        if ($count >= 0)
         {
-            $CalcMessage2 = 'The given data was not found in the file';
+            echo 'c';
+            $CalcMessage2 = 'The given data was not found in the file<br>';
+            echo '///' . $count . '///';
         }
         else
         {
+            echo 'd';
             $write = fopen('users/dirs/' . $_SESSION['whoami'] . '/tmp/requests', 'w');
             fwrite($write, $_SESSION['whoami'] . "\n" . $_SESSION['file'] . "\n" . $_SESSION['count1'] . "\n" .$_SESSION['count2'] . "\n" . $_POST['saveas2'] . "\n");
             for ($x = 0; $x < sizeof($_2dArray); $x++)
@@ -213,6 +231,7 @@
                     fwrite($write, "\n");
                 }
             }
+            echo 'e';
             fclose($write);
             $write2 = fopen('activeDir', 'w');
             fwrite($write2, $_SESSION['whoami']);
@@ -221,9 +240,9 @@
             // Run the Python script from a virtual env
             // Reminder: Ask Mrs. Casey to create the virtual env with python and modules through email
             echo shell_exec('env/bin/python src/Pearson.py 2>&1');
+            $_SESSION['page'] = 3; 
+            $_SESSION['step2'] = 0; 
         }
-        $_SESSION['step2'] = 0;
-        $_SESSION['page'] = 3;  
     }
 
     # View Commit Data
@@ -239,7 +258,7 @@
     }
     if (isset($_POST['display']))
     {
-        $_SESSION['pngFile'] = '<img height=50% length=50% src="' . $_POST['pngfile'] . '"><br><br>';
+        $_SESSION['pngFile'] = '<img height=25% length=25% src="' . $_POST['pngfile'] . '"><br><br>';
     }
 
     # Delete Commit Data
@@ -251,7 +270,7 @@
     # Leave Feedback
     if (isset($_POST['leaveFB']))
     {
-        $write = fopen('feedback', 'a');
+        $write = fopen('feedback', 'w');
         $line = '=====' . "\n" . $_SESSION['whoami'] . "\n" . $_POST['feedback'] . "\n" . '=====' . "\n";
         fwrite($write, $line);
         fclose($write);
@@ -339,7 +358,8 @@
                         '<input type="submit" class="page" name="page1" value="Manage Files">' . 
                         '<input type="submit" name="page2" class="page" value="Analyze">' . 
                         '<input type="submit" name="page3" class="page" value="View Results">' . 
-                        '<input type="submit" name="page4" class="page" value="Leave Feedback">';
+                        '<input type="submit" name="page4" class="page" value="Leave Feedback">' . 
+                        '<input type="submit" name="page5" class="page" value="Guide">';
                     }
                 ?>
             </form>
@@ -567,6 +587,14 @@
                     }
                 ?>
             </form>
+        </div>
+        <div id="body">
+            <?php
+                if ($_SESSION['logged'] && $_SESSION['page'] == 5)
+                {
+                    echo 'Work in progress';
+                }
+            ?>
         </div>
     </body>
 </html>

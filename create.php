@@ -29,12 +29,14 @@
                 $write = fopen('users/userInfo.csv', 'a');
                 fwrite($write, "\n" . $_POST['email1'] . ',' . $_POST['password1']);
                 fclose($write);
-                $create_account_message = ' Account has been successfully created.';
+                $create_account_message = ' <b>Account has been successfully created.</b>';
                 mkdir('users/dirs/' . $_POST['email1'], 0777);
                 mkdir('users/dirs/' . $_POST['email1'] . '/files', 0777);
                 mkdir('users/dirs/' . $_POST['email1'] . '/results', 0777);
                 mkdir('users/dirs/' . $_POST['email1'] . '/tmp', 0777);
                 mkdir('users/dirs/' . $_POST['email1'] . '/zip', 0777);
+                header('Location: successfulCreated.html');
+                exit();
             }
         }
         else
@@ -45,33 +47,58 @@
 ?>
 <html>
     <head>
-        <meta charset="UTF-8">
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
         <title>PHTA-v2</title>
-        <style>
-            body
-            {
-                background-color: black;
-            }
-            #body
-            {
-                background-color: white;
-            }
-            h3, b, hr
-            {
-                color: #73000a;
-            }
-        </style>
+        <link rel="stylesheet" type="text/css" href="style.css">
     </head>
+    <style>
+        body
+        {
+            background-color: black;
+        	font:14px/1.4 'Arial', 'Helvetica', sans-serif;
+        }
+        #body
+        {
+            background-color: white;
+            padding: 0;
+        }
+        #body1
+        {
+            background-color: #C70039;
+            color: white;
+        }
+        #body1 b
+        {
+            color: white;
+        }
+        .page
+        {
+            color: white;
+            font-weight: bold;
+            border-style: solid;
+            background-color: #C70029;
+            height: 30px;
+            border-color: #C70039;
+        }
+        .page:hover
+        {
+            background-color: #73000a;
+        }
+        h3, b, hr
+        {
+            color: #73000a;
+        }
+    </style>
     <body>
         <div id="body">
             <h1 style="display:inline; font-weight:normal">
                 <b>PH</b>enotype <b>T</b>ranscriptomic <b>A</b>ssociation <b>Calculator</b>
             </h1>
-            <img id="img2" src="img/nsf-logo.png" height="68px" width="68px" style="display: inline; float:right">
-            <img src="img/usc.jpeg" height="68px" width="68px" style="display: inline; float:right">
+            <img id="img2" src="img/nsf-logo.png" height="59px" width="59px" style="display: inline; float:right">
+            <img src="img/usc.jpeg" height="59px" width="59px" style="display: inline; float:right">
             </br>
-            Work of Dr. Homayoun Valafar, Dr. Hippokratis Kiaris, Naga Venkata Sai Jagjit (JJ) Satti, Youwen Zhang
-            <hr>
+            Work of Dr. Homayoun Valafar, Dr. Hippokratis Kiaris, Youwen Zhang, Naga Venkata Sai Jagjit (JJ) Satti
         </div>
         <div id="body">
             <form action="" method="post" enctype="multipart/form-data">
