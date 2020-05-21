@@ -117,9 +117,9 @@
     # Hypothetical Calculation step 2
     if (isset($_POST['commit']))
     {
-        // This makes it to allow tab delimited, but replaces /t with ','
         $tmp = str_replace("\t", ",", $_POST['userInput1']);
         $tmp = str_replace(' ,', ',', $_POST['userInput1']);
+        $tmp = str_replace(', ', ',', $_POST['userInput1']);
         $_2dArray = explode("\n", $tmp);
         $errors = FALSE;
         $limit = 1 + ($_SESSION['count2'] - $_SESSION['count1']) + 1;
@@ -172,7 +172,6 @@
     # Pre-existing Calculation Step 2
     if (isset($_POST['commit2']))
     {
-        echo 'a';
         $tmp = $_POST['userInput2'];
         $tmp = str_replace(', ', ',', $tmp);
         $tmp = str_replace(' ,', ',', $tmp);
@@ -196,23 +195,19 @@
                 {
                     $count -= 1;
                     $toAdd = explode(',', $line);
-                    echo $tmp;
+                    echo ' ' . $tmp . ' ';
                     array_push($_SESSION['array'], $toAdd);
                     continue;
                 }
             }
         }
-        echo 'b';
         fclose($read);
-        if ($count >= 0)
+        if ($count > 0)
         {
-            echo 'c';
             $CalcMessage2 = 'The given data was not found in the file<br>';
-            echo '///' . $count . '///';
         }
         else
         {
-            echo 'd';
             $write = fopen('users/dirs/' . $_SESSION['whoami'] . '/tmp/requests', 'w');
             fwrite($write, $_SESSION['whoami'] . "\n" . $_SESSION['file'] . "\n" . $_SESSION['count1'] . "\n" .$_SESSION['count2'] . "\n" . $_POST['saveas2'] . "\n");
             for ($x = 0; $x < sizeof($_2dArray); $x++)
@@ -231,7 +226,6 @@
                     fwrite($write, "\n");
                 }
             }
-            echo 'e';
             fclose($write);
             $write2 = fopen('activeDir', 'w');
             fwrite($write2, $_SESSION['whoami']);
