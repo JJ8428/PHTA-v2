@@ -627,7 +627,7 @@
                     <b>1 )</b> Choose the zip file that matches the name you saved it as and select <b>View Data</b>.<br>
                     <b>2 )</b> This will make a new menu appear labelled as <b>View Plots</b>. By the same logic as before, you can choose which graph to view by selecting it and pressing the <b>Display Plot</b> button.<br>
                     <b>3 )</b> Below the View Plots Menu, there will be a  link. Selecting the link the link will download a zip file containing all your graphs and data.<br>
-                    <img src="img/VP.png" height="50%" lenght="50%">';
+                    <img src="img/VP.png" class="img" height="50%" lenght="50%">';
                 }
             ?>
         </div>
