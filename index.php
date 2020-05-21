@@ -321,6 +321,10 @@
         {
             color: #73000a;
         }
+        .img
+        {
+            margin: 20px;
+        }
     </style>
     <body>
         <div id="body">
@@ -592,7 +596,38 @@
             <?php
                 if ($_SESSION['logged'] && $_SESSION['page'] == 5)
                 {
-                    echo 'Work in progress';
+                    echo '<h3>File Format Expected:</h3><hr> 
+                    When PHTA is used process the files to calculate data, PHTA expects the files to be formatted in a particular format...<br>
+                    <b>1 )</b> The file should be a <b>CSV</b> file.<br>
+                    <b>2 )</b> The first line of the csv file should contain 2 numbers, <b>X</b> and <b>Y</b>. <b>X</b> and <b>Y</b> indicates that in the CSV file will contain numerical data between columns <b>X</b> and <b>Y</b>, inclusively.<br>
+                    <b>3 )</b> The second line of the csv file should contain the name of column\'s containing the data<br>
+                    <b>4 )</b> The first column shouldn\'t contain any numerical data. This column will contain a string that PHTA uses to identify each row of Gene Expression Data.
+                    <img class="img" height="40%" length="40%" src="img/sampleData1.png">
+                    <h6>Sample Data to test out PHTA:</h6>
+                    <a href="sampledata/sampledata1.csv" download>sampledata1.csv</a><br>
+                    <a href="sampledata/sampledata2.csv" download>sampledata2.csv</a>
+                    <h3>Analyzing with Gene Expression Data</h3><hr>
+                    <b>1 )</b> Select the csv file containing your data of interest. The file used in the example is "sampledata1.csv".<br>
+                    <b>2 )</b> After selecting your file, it will ask for the identifiers, or in this case the <b>Gene.name</b> that are associated with each row of Gene Expression Data you want to compare to all other rows. <br>
+                    &emsp; <b>a )</b> In this example, the user wants to analyze the Gene Expression Data within the file with the Gene Expression Data within the files that contain the following Gene.names:<br>
+                    &emsp; <b>Atf4,Nck1,Artn,Ears2</b>.<br>
+                    <b>3 )</b> Provide a name to save your data. In the example shown, the save is named as <b>test123</b>.<br>
+                    <img src="img/AGEDS2.png" class="img" height="50%" length="50%"><br>
+                    <b>4 )</b> If PHTA is unable to find the Identifiers in the file you selected, you will be returned to step 2. Otherwise, you will be transported to the <b>Access Data</b> tab, where you can access your data.
+                    <h3>Analyzing with Quantitative Data</h3><hr>
+                    <b>1 )</b> Select the csv file containing your data of interest. The file used in the example is "sampledata1.csv".<br>
+                    <b>2 )</b> Enter the quantitative phenotypic data that you would like to compare to the other rows of Gene Expression Data. <br>
+                    &emsp; <b>a )</b> PHTA will provide a template as to how the data should be formatted.<br>
+                    &emsp; <b>b )</b> The data can be either comma delimited or tab delimited and each rows must be inserted in the next line. An example is shown below.<br>
+                    &emsp; <b>c )</b> In this example, the user wants to compare the Gene Expression Data in the file with the following Gene Expression not found in the file: <b>sample1,1,2,3,4,5,6</b> and <b>sample2,1,2,3,4,5,6</b>.<br>
+                    <b>3 )</b> Provide a name to save your data. In the example shown, the save is named as <b>test1234</b>.<br>
+                    <img src="img/AQDS2.png" class="img" height="50%" length="50%"><br>
+                    <b>4 )</b> If PHTA is unable to find the Identifiers in the file you selected, you will be returned to step 2. Otherwise, you will be transported to the <b>Access Data</b> tab, where you can access your data.
+                    <h3>Accessing your data</h3><hr>
+                    <b>1 )</b> Choose the zip file that matches the name you saved it as and select <b>View Data</b>.<br>
+                    <b>2 )</b> This will make a new menu appear labelled as <b>View Plots</b>. By the same logic as before, you can choose which graph to view by selecting it and pressing the <b>Display Plot</b> button.<br>
+                    <b>3 )</b> Below the View Plots Menu, there will be a  link. Selecting the link the link will download a zip file containing all your graphs and data.<br>
+                    <img src="img/VP.png" height="50%" lenght="50%">';
                 }
             ?>
         </div>
