@@ -19,7 +19,8 @@
     $_SESSION['category']; //String
     $_SESSION['array']; // Array
     $_SESSION['page']; // Integer
-
+    $_SESSION['analysisSession']; // Boolean
+    $_SERVER['recentAnalysis']; // String
 
     # Login function
     if (isset($_POST['login']))
@@ -39,6 +40,7 @@
                 $_SESSION['step2'] = 0;
                 $found = TRUE;
                 $_SESSION['page'] = 1;
+                $_SESSION['analysisSession'] = FALSE;
             }
         }
     }
@@ -147,6 +149,8 @@
             echo shell_exec('env/bin/python src/Pearson.py 2>&1');
             $_SESSION['page'] = 3;
             $_SESSION['step2'] = 0;
+            $_SESSION['analysisSession'] = TRUE;
+            $_SESSION['recentAnalysis'] = 'Click here to download your most recent analysis: <a href="users/dirs/' . $_SESSION['whoami'] . '/zip/' . $_POST['saveas'] . '.zip" download>' . $_POST['saveas'] . '.zip</a>';
         }
     }
 
@@ -235,7 +239,9 @@
             // Reminder: Ask Mrs. Casey to create the virtual env with python and modules through email
             echo shell_exec('env/bin/python src/Pearson.py 2>&1');
             $_SESSION['page'] = 3; 
-            $_SESSION['step2'] = 0; 
+            $_SESSION['step2'] = 0;
+            $_SESSION['analysisSession'] = TRUE;
+            $_SESSION['recentAnalysis'] = 'Click here to download your most recent analysis: <a href="users/dirs/' . $_SESSION['whoami'] . '/zip/' . $_POST['saveas2'] . '.zip" download>' . $_POST['saveas2'] . '.zip</a>';
         }
     }
 
@@ -517,6 +523,12 @@
             </form>
         </div>
         <div id="body">
+            <?php
+                if ($_SESSION['logged'] && $_SESSION['page'] == 3 && $_SESSION['analysisSession'])
+                {
+                    echo '<h5>' . $_SESSION['recentAnalysis'] . '</h5>';
+                }
+            ?>
             <form action="" method="post" enctype="multipart/form-data">
                 <?php
                     // Show commit history
@@ -618,9 +630,10 @@
                     <img src="img/AQDS2.png" class="img" height="50%" length="50%"><br>
                     <b>4 )</b> If PHTA is unable to find the Identifiers in the file you selected, you will be returned to step 2. Otherwise, you will be transported to the <b>Access Data</b> tab, where you can access your data.
                     <h3>Accessing your data</h3><hr>
-                    <b>1 )</b> Choose the zip file that matches the name you saved it as and select <b>View Data</b>.<br>
-                    <b>2 )</b> This will make a new menu appear labelled as <b>View Plots</b>. By the same logic as before, you can choose which graph to view by selecting it and pressing the <b>Display Plot</b> button.<br>
-                    <b>3 )</b> Below the View Plots Menu, there will be a  link. Selecting the link the link will download a zip file containing all your graphs and data.<br>
+                    <b>1 )</b> Your most recent analysis in your current session will always be shown at top under as a download link. To view the pcitures of that analysis or to access data regarding previous analyses, follow the next steps.<br>
+                    <b>2 )</b> Choose the zip file that matches the name you saved it as and select <b>View Data</b>.<br>
+                    <b>3 )</b> This will make a new menu appear labelled as <b>View Plots</b>. By the same logic as before, you can choose which graph to view by selecting it and pressing the <b>Display Plot</b> button.<br>
+                    <b>4 )</b> Below the View Plots Menu, there will be a  link. Selecting the link the link will download a zip file containing all your graphs and data.<br>
                     <img src="img/VP.png" class="img" height="50%" lenght="50%">';
                 }
             ?>
