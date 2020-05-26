@@ -147,7 +147,7 @@
             // Run the Python script from a virtual env
             // Reminder: Ask Mrs. Casey to create the virtual env with python and modules through email
             echo shell_exec('env/bin/python src/Pearson.py 2>&1');
-            $_SESSION['page'] = 3;
+            $_SESSION['page'] = 2;
             $_SESSION['step2'] = 0;
             $_SESSION['analysisSession'] = TRUE;
             $_SESSION['recentAnalysis'] = 'Click here to download your most recent analysis: <a href="users/dirs/' . $_SESSION['whoami'] . '/zip/' . $_POST['saveas'] . '.zip" download>' . $_POST['saveas'] . '.zip</a>';
@@ -256,9 +256,15 @@
         $_SESSION['zipFile'] = '<a href="' . $_POST['zipfile'] . '" Download>Click here</a>' . ' to download data and plots.';
         echo shell_exec('env/bin/python src/Extract.py ' . $_SESSION['zipOI'] . ' ' . 'users/dirs/' . $_SESSION['whoami'] . '/results 2>&1');
     }
+
+    # View Commit Plots
     if (isset($_POST['display']))
     {
-        $_SESSION['pngFile'] = '<img height=25% length=25% src="' . $_POST['pngfile'] . '"><br><br>';
+        $_SESSION['pngFile'] = '<img height=45% length=45% src="users/dirs/' . $_SESSION['whoami'] . '/results/' . $_POST['xaxis'] . '_vs_' . $_POST['yaxis'] . '.png" alt="Plots with the matching X axis and Y axis will not be generated."><br><br>';
+    }
+    else
+    {
+        $_SESSION['pngFile'] = "Plots with the matching X axis and Y axis will not be generated.<br><br>";
     }
 
     # Delete Commit Data
@@ -521,12 +527,18 @@
                     }
                 ?>
             </form>
+            <?php
+                if ($_SESSION['logged'] && $_SESSION['page'] == 2 && $_SESSION['analysisSession'])
+                {
+                    echo '<h4>' . $_SESSION['recentAnalysis'] . '</h4>';
+                }
+            ?>
         </div>
         <div id="body">
             <?php
                 if ($_SESSION['logged'] && $_SESSION['page'] == 3 && $_SESSION['analysisSession'])
                 {
-                    echo '<h5>' . $_SESSION['recentAnalysis'] . '</h5>';
+                    echo '<h4>' . $_SESSION['recentAnalysis'] . '</h4>';
                 }
             ?>
             <form action="" method="post" enctype="multipart/form-data">
@@ -553,7 +565,46 @@
                     if ($_SESSION['logged'] && $_SESSION['showPNG'] && $_SESSION['page'] == 3)
                     {
                         echo '<h3>View Plots:</h3><hr>' . 
-                        $_SESSION['pngFile'] .
+                        $_SESSION['pngFile'];
+                        $read = fopen(glob('users/dirs/' . $_SESSION['whoami']. '/results/*.csv')[0], 'r');
+                        while(!feof($read))
+                        {
+                            $line = fgets($read);
+                            if (strpos($line, 'P Values'))
+                            {
+                                break;
+                            }
+                        }
+                        $header = explode(',', $line);
+                        $low = 0;
+                        $high = 0;
+                        for ($a = 0; $a < sizeof($header); $a++)
+                        {
+                            if ($header[$a] == 'P Values')
+                            {
+                                $low = $a + 1;
+                            }
+                            else if ($header[$a] == 'R Values')
+                            {
+                                $high = $a;
+                            }
+                        }
+                        echo 'Select the <b>' . $header[0] . '</b> to appear on the X axis:<br><br>' . 
+                        '<select name="xaxis">';
+                        for ($a = $low; $a < $high; $a++)
+                        {
+                            echo '<option value="' . $header[$a] . '">' . $header[$a] . '</option>';
+                        }
+                        echo '</select><br><br>' . 
+                        'Select the <b>' . $header[0] . '</b> to appear on the Y axis:<br><br>' . 
+                        '<select name="yaxis">';
+                        for ($a = $low; $a < $high; $a++)
+                        {
+                            echo '<option value="' . $header[$a] . '">' . $header[$a] . '</option>';
+                        }
+                        echo '</select><br><br>';
+                        # Old version of image showing
+                        /*
                         'Select plot for display:<br><br>' . 
                         '<select name="pngfile">';
                         $pngs = scandir('users/dirs/' . $_SESSION['whoami'] . '/results');
@@ -561,8 +612,8 @@
                         {
                             echo '<option value="' .  'users/dirs/' . $_SESSION['whoami'] . '/results/' . $pngs[$x] . '">' . $pngs[$x] . '</option>';
                         }
-                        echo '</select><br><br>' . 
-                        '<input type="submit" name="display" value="Display Plot"><br><br>' . 
+                        echo '</select><br><br>' . */
+                        echo '<input type="submit" name="display" value="Display Plot"><br><br>' . 
                         $_SESSION['zipFile'];
                     }
                 ?>
@@ -619,7 +670,7 @@
                     &emsp; <b>Atf4,Nck1,Artn,Ears2</b>.<br>
                     <b>3 )</b> Provide a name to save your data. In the example shown, the save is named as <b>test123</b>.<br>
                     <img src="img/AGEDS2.png" class="img" height="50%" length="50%"><br>
-                    <b>4 )</b> If PHTA is unable to find the Identifiers in the file you selected, you will be returned to step 2. Otherwise, you will be transported to the <b>Access Data</b> tab, where you can access your data.
+                    <b>4 )</b> If PHTA is unable to find the Identifiers in the file you selected, you will be returned to step 2. Otherwise, you will be transported to the <b>View Results/Access Data</b> tab, where you can access your data.
                     <h3>Analyzing with Quantitative Data</h3><hr>
                     <b>1 )</b> Select the csv file containing your data of interest. The file used in the example is "sampledata1.csv".<br>
                     <b>2 )</b> Enter the quantitative phenotypic data that you would like to compare to the other rows of Gene Expression Data. <br>
@@ -628,13 +679,7 @@
                     &emsp; <b>c )</b> In this example, the user wants to compare the Gene Expression Data in the file with the following Gene Expression not found in the file: <b>sample1,1,2,3,4,5,6</b> and <b>sample2,1,2,3,4,5,6</b>.<br>
                     <b>3 )</b> Provide a name to save your data. In the example shown, the save is named as <b>test1234</b>.<br>
                     <img src="img/AQDS2.png" class="img" height="50%" length="50%"><br>
-                    <b>4 )</b> If PHTA is unable to find the Identifiers in the file you selected, you will be returned to step 2. Otherwise, you will be transported to the <b>Access Data</b> tab, where you can access your data.
-                    <h3>Accessing your data</h3><hr>
-                    <b>1 )</b> Your most recent analysis in your current session will always be shown at top under as a download link. To view the pcitures of that analysis or to access data regarding previous analyses, follow the next steps.<br>
-                    <b>2 )</b> Choose the zip file that matches the name you saved it as and select <b>View Data</b>.<br>
-                    <b>3 )</b> This will make a new menu appear labelled as <b>View Plots</b>. By the same logic as before, you can choose which graph to view by selecting it and pressing the <b>Display Plot</b> button.<br>
-                    <b>4 )</b> Below the View Plots Menu, there will be a  link. Selecting the link the link will download a zip file containing all your graphs and data.<br>
-                    <img src="img/VP.png" class="img" height="50%" lenght="50%">';
+                    <b>4 )</b> If PHTA is unable to find the Identifiers in the file you selected, you will be returned to step 2. Otherwise, if succesful, a link will appear at the bottom of your page to download the results. If you wish to access any possible plots generated from testing multiple rows of quantitative data, please go through the <b>View Results/Access Data</b>.';
                 }
             ?>
         </div>
