@@ -180,27 +180,28 @@
         $tmp = str_replace(', ', ',', $tmp);
         $tmp = str_replace(' ,', ',', $tmp);
         $tmp = ltrim($tmp);
-        $_2dArray = explode(',', $tmp);
+        $geneName = explode(',', $tmp);
         $errors = FALSE;
         $read = fopen($_SESSION['file'], 'r');
         fgets($read);
         fgets($read);
         $_SESSION['array'] = [];
-        $count = sizeof($_2dArray);
+        $_SESSION['geneName'] = [];
+        $count = sizeof($geneName);
         while (!feof($read))
         {
             $line = fgets($read);
             $line = str_replace("\n", '', $line);
             $tmp = strtolower(explode(',', $line)[0]);
-            for ($x = 0; $x < sizeof($_2dArray); $x++)
+            for ($x = 0; $x < sizeof($geneName); $x++)
             {
-                $clone = 0;
-                if ($tmp == strtolower($_2dArray[$x]))
+                if ($tmp == strtolower($geneName[$x]))
                 {
                     $count -= 1;
                     $toAdd = explode(',', $line);
                     echo ' ' . $tmp . ' ';
                     array_push($_SESSION['array'], $toAdd);
+                    array_push($_SESSION['geneName'], $geneName[$x]);
                     continue;
                 }
             }
@@ -214,9 +215,9 @@
         {
             $write = fopen('users/dirs/' . $_SESSION['whoami'] . '/tmp/requests', 'w');
             fwrite($write, $_SESSION['whoami'] . "\n" . $_SESSION['file'] . "\n" . $_SESSION['count1'] . "\n" .$_SESSION['count2'] . "\n" . $_POST['saveas2'] . "\n");
-            for ($x = 0; $x < sizeof($_2dArray); $x++)
+            for ($x = 0; $x < sizeof($geneName); $x++)
             {
-                fwrite($write, $_2dArray[$x] . ',');
+                fwrite($write, $_SESSION['geneName'][$x] . ',');
                 for ($y = $_SESSION['count1'] - 1; $y < $_SESSION['count2']; $y++)
                 {
                     fwrite($write, $_SESSION['array'][$x][$y]);
@@ -225,7 +226,7 @@
                         fwrite($write, ',');
                     }
                 }
-                if ($x != sizeof($_2dArray) - 1)
+                if ($x != sizeof($geneName) - 1)
                 {
                     fwrite($write, "\n");
                 }
@@ -253,11 +254,12 @@
         fclose($write2);
         $_SESSION['showPNG'] = TRUE;
         $_SESSION['zipOI'] = $_POST['zipfile'];
-        $_SESSION['zipFile'] = '<a href="' . $_POST['zipfile'] . '" Download>Click here</a>' . ' to download data and plots.';
-        echo shell_exec('env/bin/python src/Extract.py ' . $_SESSION['zipOI'] . ' ' . 'users/dirs/' . $_SESSION['whoami'] . '/results 2>&1');
+        $_SESSION['zipFile'] = '<a href="' . $_POST['zipfile'] . '" Download>Click here</a>' . ' to download data and plots of <b>' . explode('/', $_SESSION['zipOI'])[sizeof(explode('/', $_SESSION['zipOI'])) - 1] . '</b>';
+        shell_exec('env/bin/python src/Extract.py ' . $_SESSION['zipOI'] . ' ' . 'users/dirs/' . $_SESSION['whoami'] . '/results 2>&1');
     }
 
     # View Commit Plots
+    /*
     if (isset($_POST['display']))
     {
         $_SESSION['pngFile'] = '<img height=45% length=45% src="users/dirs/' . $_SESSION['whoami'] . '/results/' . $_POST['xaxis'] . '_vs_' . $_POST['yaxis'] . '.png" alt="Plots with the matching X axis and Y axis will not be generated."><br><br>';
@@ -265,6 +267,15 @@
     else
     {
         $_SESSION['pngFile'] = "Plots with the matching X axis and Y axis will not be generated.<br><br>";
+    }
+    */
+    if (isset($_POST['display']))
+    {
+        $_SESSION['pngFile'] = '<img height=25% length=25% src="' . $_POST['pngfile'] . '"><br><br>';
+    }
+    else
+    {
+        $_SESSION['pngFile'] = 'Please select an image to view.';
     }
 
     # Delete Commit Data
@@ -562,7 +573,8 @@
             <form action="" method="post" enctype="multipart/form-data">
                 <?php
                     // Show the commit download and option to scroll photos
-                    if ($_SESSION['logged'] && $_SESSION['showPNG'] && $_SESSION['page'] == 3)
+                    // This is the version with axes option, modify the Pearson.py if you want this again
+                    /*if ($_SESSION['logged'] && $_SESSION['showPNG'] && $_SESSION['page'] == 3)
                     {
                         echo '<h3>View Plots:</h3><hr>' . 
                         $_SESSION['pngFile'];
@@ -612,8 +624,23 @@
                         {
                             echo '<option value="' .  'users/dirs/' . $_SESSION['whoami'] . '/results/' . $pngs[$x] . '">' . $pngs[$x] . '</option>';
                         }
-                        echo '</select><br><br>' . */
+                        echo '</select><br><br>' . //
                         echo '<input type="submit" name="display" value="Display Plot"><br><br>' . 
+                        $_SESSION['zipFile'];                    
+                    }*/
+                    if ($_SESSION['logged'] && $_SESSION['showPNG'] && $_SESSION['page'] == 3)
+                    {
+                        echo '<h3>View Plots:</h3><hr>' . 
+                        $_SESSION['pngFile'] .
+                        'Select plot for display:<br><br>' . 
+                        '<select name="pngfile">';
+                        $pngs = scandir('users/dirs/' . $_SESSION['whoami'] . '/results');
+                        for ($x = 2; $x < sizeof($pngs); $x++)
+                        {
+                            echo '<option value="' .  'users/dirs/' . $_SESSION['whoami'] . '/results/' . $pngs[$x] . '">' . $pngs[$x] . '</option>';
+                        }
+                        echo '</select><br><br>' . 
+                        '<input type="submit" name="display" value="Display Plot"><br><br>' . 
                         $_SESSION['zipFile'];
                     }
                 ?>

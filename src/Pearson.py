@@ -116,7 +116,7 @@ for a in range(0, RP.__len__()):
             tmp.append(RP[a][b][0])
     R.append(tmp)
 for a in range(0, R.__len__()):
-    for b in range(0, R.__len__()):
+    for b in range(a, R.__len__()):
         if a != b:
             fig, ax = plt.subplots()
             ax.scatter(R[a], R[b])
